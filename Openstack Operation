@@ -7,4 +7,9 @@ Examples of burn-in tests include running a CPU or disk benchmark for several da
 
 For capacity planning this link is very good. https://docs.openstack.org/operations-guide/ops-capacity-planning-scaling.html
 
+openstack --debug server list # use --debug to show api calls
+openstack compute service list --long # how to get an overview of your cloud, its shape, size, and current state.
+openstack catalog list
+nova diagnostics <serverID>
 
+The admin is global, not per project, so granting a user the admin role in any project gives the user administrative rights across the whole cloud.
