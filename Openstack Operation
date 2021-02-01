@@ -2,7 +2,9 @@ Cloud-based applications typically request more discrete hardware (horizontal sc
 scale (vertical scaling).
 OpenStack is designed to be horizontally scalable. Rather than switching to larger servers, you procure more servers and simply install identically configured 
 services.
-Hardware does not have to be consistent, but it should at least have the same type of CPU to support instance migration.
+Hardware does not have to be consistent, but it should at least have the same type of CPU to support instance  live migration but for cold migration it shouldn't
+be identical.
+
 Examples of burn-in tests include running a CPU or disk benchmark for several days.
 
 For capacity planning this link is very good. https://docs.openstack.org/operations-guide/ops-capacity-planning-scaling.html
@@ -38,12 +40,36 @@ openstack server reboot --hard <server> # it regerate the xml file and  then reb
 
 # data of the instances are in /var/lib/nova/instances
 
+# priority for Handling a Complete Failure use this link
+https://docs.openstack.org/operations-guide/ops-maintenance-complete.html
+
 # to mount the disk of openstack instance we should do this.
 modprob nbd
 sudo qemu-nbd -c /dev/nbd0 rbd:nova/dcd23225-cf06-466f-91da-f866a9cd8791_disk -f raw
 mount /dev/nbd0p1 /mnt
 umount /mnt
 sudo qemu-nbd -d /dev/nbd0
+
+OpenStack does not configure the databases out of the ordinary. Basic administration includes performance tweaking, high availability, backup, recovery, and 
+repairing. For more information, see a standard MySQL administration guide.
+Also check RabbitMQ message queues that are growing without being consumed which will indicate which OpenStack services are affected. Restart the affected 
+OpenStack services.
+
+# to-do items list:
+https://docs.openstack.org/operations-guide/ops-maintenance-hdmwy.html#semiannually
+
+Unfortunately, sometimes the error is not apparent from the log files. In this case, switch tactics and use a different command; maybe run the service directly 
+on the command line.
+
+# for slowness check this link
+https://docs.openstack.org/operations-guide/ops-maintenance-slow.html
+Sometimes messages queued for services stay on the queues and are not consumed. This can be due to dead or stagnant services and can be commonly cleared up by 
+either restarting the AMQP-related services or the OpenStack service in question.
+
+# to uninstall openstack use this link
+https://docs.openstack.org/operations-guide/ops-uninstall.html
+
+
 
 
 
