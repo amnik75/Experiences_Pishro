@@ -1,0 +1,55 @@
+https://superuser.openstack.org/articles/spot-the-difference-tenant-provider-and-external-neutron-networks/#:~:text=Therefor%2C%20provider%20networks%20are%20often,aptly%20named%20'external').
+
+Compute hosts should always have the appropriate NICs configured for promiscuous mode.
+OpenStack is able to take advantage of VLANs to isolate the traffic of different projects, even if the projects happen to have instances running on the same 
+compute host.
+Note that if you are using VLANs on your physical switches to implement project isolation in your OpenStack cloud, you must ensure that all of your 
+switchports are configured as trunk ports.
+https://docs.openstack.org/neutron/ussuri/admin/intro-basic-networking.html
+
+services port openstack https://docs.openstack.org/install-guide/firewalls-default-ports.html
+
+UDP has support for one-to-many communication: sending a single packet to multiple hosts. An application can broadcast a UDP packet to all of the 
+etwork hosts on a local network by setting the receiver IP address as the special IP broadcast address 255.255.255.255
+An application can also send a UDP packet to a set of receivers using IP multicast.
+https://docs.openstack.org/neutron/ussuri/admin/intro-basic-networking.html
+
+TCP is a protocol for communication between exactly two endpoints so we can not use it for broadcast and multicast.
+https://stackoverflow.com/questions/21266008/can-i-use-broadcast-or-multicast-for-tcp
+
+Each network namespace also has its own routing table, and in fact this is the main reason for namespaces to exist
+A routing table is keyed by destination IP address, so network namespaces are what you need if you want the same destination IP address to mean 
+different things at different times- which is something that OpenStack Networking requires for its feature of providing overlapping IP addresses in 
+different virtual networks.
+Each network namespace also has its own set of iptables (for both IPv4 and IPv6). So, you can apply different security to flows with the same IP addressing 
+in different namespaces, as well as different routing.
+https://docs.openstack.org/neutron/ussuri/admin/intro-network-namespaces.html
+
+in the form that OpenStack deployments use, a NAT router on the path between the sender and receiver replaces the packet’s source IP address with the 
+router’s public IP address. The router also modifies the source TCP or UDP port to another value, and the router maintains a record of the sender’s 
+true IP address and port, as well as the modified IP address and port.
+OpenStack uses SNAT to enable applications running inside of instances to connect out to the public Internet.
+OpenStack uses DNAT to route packets from instances to the OpenStack metadata service.
+OpenStack uses one-to-one NAT to implement floating IP addresses.
+https://docs.openstack.org/neutron/ussuri/admin/intro-nat.html
+
+In general, the OpenStack Networking software components that handle layer-3 operations impact performance and reliability the most. To improve performance 
+and reliability, provider networks move layer-3 operations to the physical network infrastructure.
+The Networking service uses a layer-3 agent to manage routers via namespaces.
+The Networking service implements the DHCP service using an agent that manages qdhcp namespaces and the dnsmasq service.
+If you launch an instance without specifying a security group, the default security group automatically applies to it. Similarly, if you create a port 
+without specifying a security group, the default security group automatically applies to it.
+Security group rules are stateful. Thus, allowing ingress TCP port 22 for secure shell automatically creates rules that allow return egress traffic and 
+ICMP error messages involving those TCP connections.
+https://docs.openstack.org/neutron/ussuri/admin/intro-os-networking.html ***Read it in future again***
+
+can we have floating ip without having router for network project?
+doesn't gre and vxlan need switch cinfiguration in datacenter?
+provider network is flat and project network is gre?
+where the security group handle?
+how does vm in network comunicate?
+route for local network go to qrouter?
+why one project network get multiple subnets?
+network topology with firewalls?
+
+
