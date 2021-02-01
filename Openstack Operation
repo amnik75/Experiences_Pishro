@@ -13,3 +13,40 @@ openstack catalog list
 nova diagnostics <serverID>
 
 The admin is global, not per project, so granting a user the admin role in any project gives the user administrative rights across the whole cloud.
+
+ps aux | grep nova-
+ps aux | grep glance-
+ps aux | grep keystone
+ps aux | grep cinder
+
+# If the commands work as expected, you can be confident that those services are in working condition
+. openrc
+openstack image list
+openstack server list
+openstack project list
+
+ip route get <ip> # for more information :)
+
+# for Cloud Controller failure this link is good
+https://docs.openstack.org/operations-guide/ops-maintenance-controller.html
+
+# for Compute Node Failures and Maintenance this link is good
+https://docs.openstack.org/operations-guide/ops-maintenance-compute.html
+
+# istances xml files are in /etc/libvirt/qemu/instance-xxxxxxxx.xml
+openstack server reboot --hard <server> # it regerate the xml file and  then reboot it
+
+# data of the instances are in /var/lib/nova/instances
+
+# to mount the disk of openstack instance we should do this.
+modprob nbd
+sudo qemu-nbd -c /dev/nbd0 rbd:nova/dcd23225-cf06-466f-91da-f866a9cd8791_disk -f raw
+mount /dev/nbd0p1 /mnt
+umount /mnt
+sudo qemu-nbd -d /dev/nbd0
+
+
+
+
+
+
