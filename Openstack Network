@@ -52,4 +52,17 @@ route for local network go to qrouter?
 why one project network get multiple subnets?
 network topology with firewalls?
 
+You can find out what TAP is being used by looking at the /etc/libvirt/qemu/instance-xxxxxxxx.xml file.
+The TAP device name is constructed using the first 11 characters of the port ID (10 hex digits plus an included ‘-‘)
+he TAP devices and veth devices are normal Linux network devices and may be inspected with the usual tools, such as ip and tcpdump. Open vSwitch internal 
+devices, such as patch-tun, are only visible within the Open vSwitch environment. If you try to run tcpdump -i patch-tun, it will raise an error, saying that 
+the device does not exist
+
+
+
+
+
+
+
+
 
