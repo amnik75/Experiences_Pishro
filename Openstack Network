@@ -92,7 +92,7 @@ qg-<id> id is related to the port id in external subnet connect to br-ex
 # you can see this port in netns dhcp
 tap<id> id is related to the port id for dhcp that connec to br-int
 
-
+arp of the floating ip is answered with the mac of interface of router that connect to the external network.
 
 
 
