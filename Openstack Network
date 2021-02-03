@@ -58,9 +58,39 @@ he TAP devices and veth devices are normal Linux network devices and may be insp
 devices, such as patch-tun, are only visible within the Open vSwitch environment. If you try to run tcpdump -i patch-tun, it will raise an error, saying that 
 the device does not exist
 
+On the integration bridge, networks are distinguished using internal VLANs regardless of how the networking service defines them. This allows instances on the 
+same host to communicate directly without transiting the rest of the virtual, or physical, network. These internal VLAN IDs are based on the order they are 
+created on the node and may vary between nodes. These IDs are in no way related to the segmentation IDs used in the network definition and on the physical wire.
+All interfaces on the br-tun are internal to Open vSwitch. To monitor traffic on them, you need to set up a mirror port 
+All translation of GRE tunnels to and from internal VLANs happens on br-tun.
+Note that any traffic to the l3-agent or dhcp-agent will be visible only within their network namespace.
+Use ping to quickly find where a failure exists in the network path. In an instance, first see whether you can ping an external host, such as google.com. 
+If you can, then there shouldn’t be a network problem at all.
 
+One common networking problem is that an instance boots successfully but is not reachable because it failed to obtain an IP address from dnsmasq, which is the 
+DHCP server that is launched by the nova-network service.
+The simplest way to identify that this is the problem with your instance is to look at the console output of your instance. If DHCP failed, you can retrieve the 
+console log by doing:
+openstack console log show <instance name or uuid>
+A DHCP problem might be caused by a misbehaving dnsmasq process. First, debug by checking logs and then restart the dnsmasq processes only for that 
+project (tenant)
+ps aux | grep dnsmasq # check that dhcp is running
+If your instances are still not able to obtain IP addresses, the next thing to check is whether dnsmasq is seeing the DHCP requests from the instance. 
+On the machine that is running the dnsmasq process, which is the compute host if running in multi-host mode, look at /var/log/syslog to see the dnsmasq output.
+In an OpenStack cloud, the dnsmasq process acts as the DNS server for the instances in addition to acting as the DHCP server. A misbehaving dnsmasq process may 
+be the source of DNS-related issues inside the instance
 
+your network nodes will run their dhcp-agents and l3-agents in isolated namespaces. Network interfaces and traffic on those interfaces will not be visible in 
+the default namespace
+qrouter-<id router>
+qdhcp-<id network>
 
+# you can see these ports in netns router
+qr-<id> id is related to the port id in internal subnet connect ot br-int
+qg-<id> id is related to the port id in external subnet connect to br-ex
+
+# you can see this port in netns dhcp
+tap<id> id is related to the port id for dhcp that connec to br-int
 
 
 
