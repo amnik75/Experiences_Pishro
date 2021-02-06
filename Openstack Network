@@ -98,5 +98,5 @@ each network in openstack has tunnel id that can see in "openstack network show 
 br-int use internal vlan to distingushes networks. each internal vlan id has internal tunnel id. so the br-int add internal vlan id and then exchange it to tunnel
 id then send it to br-tun via path-tun.
 
-
+if restart neutron-agents then restart neutron-server to take affect in "neutron agent-list"
 
