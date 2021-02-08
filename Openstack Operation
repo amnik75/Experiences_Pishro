@@ -73,7 +73,8 @@ https://docs.openstack.org/operations-guide/ops-uninstall.html
 # for checking logs of dnsmasq use /var/log/syslog
 # for checking logs of instances use /var/log/libvirt/qemu/
 # for checking logs of instances console use /var/lib/nova/instances/instance-<instance id>/console.log
-#for checking more logs of keystone use /var/log/apache2 beside /var/log/keystone
+# for checking more logs of keystone use /var/log/apache2 beside /var/log/keystone
+# for checking logs of services api use /var/log/apache2
 
 The first step in finding the source of an error is typically to search for a CRITICAL, or ERROR message in the log starting at the bottom of the log file.
 
