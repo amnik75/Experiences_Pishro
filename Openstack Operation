@@ -86,9 +86,5 @@ If no ERROR or CRITICAL messages appear, the most recent log entry that reports 
 # show the usage of the projects
 openstack usage list
 
-
-
-
-
-
-
+use rsync to backup the directory to another server
+Backup and subsequent recovery is one of the first tasks system administrators learn
