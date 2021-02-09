@@ -1,0 +1,3 @@
+if one of the osd reach full ratio you can increase the full ratio ( before decreasing it is good to delete the unneccessary objects to queue them) 
+and then delete the unnecessary objects then set back the full ratio. # you can use below link
+https://access.redhat.com/documentation/en-us/red_hat_ceph_storage/4/html-single/troubleshooting_guide/index#deleting-data-from-a-full-storage-cluster_diag
