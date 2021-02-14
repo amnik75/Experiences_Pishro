@@ -1,0 +1,54 @@
+ Ceph OSD Daemons handle read, write, and replication operations on storage drives. With the older Filestore back end, each RADOS object was stored as a separate 
+ file on a conventional filesystem (usually XFS). With the new and default BlueStore back end, objects are stored in a monolithic database-like fashion.
+ Ceph OSD Daemons store data as objects in a flat namespace (e.g., no hierarchy of directories). An object has an identifier, binary data, and metadata consisting 
+ of a set of name/value pairs.
+ Ceph OSD Daemons create object replicas on other Ceph Nodes to ensure data safety and high availability. Ceph also uses a cluster of monitors to ensure 
+ high availability. To eliminate centralization, Ceph uses an algorithm called CRUSH.
+ 
+ Cluster Map: Monitor Map,OSD Map,PG Map,CRUSH Map,MDS Map
+ Each map maintains an iterative history of its operating state changes. Ceph Monitors maintain a master copy of the cluster map including the cluster members, 
+ state, changes, and the overall health of the Ceph Storage Cluster.
+ 
+ Before Ceph Clients can read or write data, they must contact a Ceph Monitor to obtain the most recent copy of the cluster map. A Ceph Storage Cluster can operate 
+ with a single monitor; however, this introduces a single point of failure.
+ 
+ For added reliability and fault tolerance, Ceph supports a cluster of monitors. In a cluster of monitors, latency and other faults can cause one or more monitors 
+ to fall behind the current state of the cluster. For this reason, Ceph must have agreement among various monitor instances regarding the state of the cluster. 
+ Ceph always uses a majority of monitors (e.g., 1, 2:3, 3:5, 4:6, etc.)
+ 
+ Cephx uses shared secret keys for authentication, meaning both the client and the monitor cluster have a copy of the client’s secret key.
+ 
+ A key scalability feature of Ceph is to avoid a centralized interface to the Ceph object store, which means that Ceph clients must be able to interact with OSDs 
+ directly.
+ Cephx uses shared secret keys for authentication, meaning both the client and the monitor cluster have a copy of the client’s secret key.
+ A user/actor invokes a Ceph client to contact a monitor. each monitor can authenticate users and distribute keys, so there is no single point of failure or 
+ bottleneck when using cephx.
+ The monitor returns an authentication data structure similar to a Kerberos ticket that contains a session key for use in obtaining Ceph services. This session key 
+ is itself encrypted with the user’s permanent secret key, so that only the user can request services from the Ceph Monitor(s). The client then uses the session 
+ key to request its desired services from the monitor, and the monitor provides the client with a ticket that will authenticate the client to the OSDs that actually 
+ handle data. Ceph Monitors and OSDs share a secret, so the client can use the ticket provided by the monitor with any OSD or metadata server in the cluster.
+ 
+ cephx tickets expire, so an attacker cannot use an expired ticket or session key obtained surreptitiously.
+ 
+ To use cephx, an administrator must set up users first. In the following diagram, the client.admin user invokes ceph auth get-or-create-key from the 
+ command line to generate a username and secret key. Ceph’s auth subsystem generates the username and key, stores a copy with the monitor(s) and transmits 
+ the user’s secret back to the client.admin user. This means that the client and the monitor share a secret key.
+ 
+ To authenticate with the monitor, the client passes in the user name to the monitor, and the monitor generates a session key and encrypts it with the secret key 
+ associated to the user name. Then, the monitor transmits the encrypted ticket back to the client. The client then decrypts the payload with the shared secret key 
+ to retrieve the session key. The session key identifies the user for the current session. The client then requests a ticket on behalf of the user signed by the 
+ session key. The monitor generates a ticket, encrypts it with the user’s secret key and transmits it back to the client. The client decrypts the ticket and uses 
+ it to sign requests to OSDs and metadata servers throughout the cluster.  
+ 
+ The cephx protocol authenticates ongoing communications between the client machine and the Ceph servers. Each message sent between a client and server, 
+ subsequent to the initial authentication, is signed using a ticket that the monitors, OSDs and metadata servers can verify with their shared secret.
+ 
+ The protection offered by this authentication is between the Ceph client and the Ceph server hosts. The authentication is not extended beyond the Ceph client. 
+ If the user accesses the Ceph client from a remote host, Ceph authentication is not applied to the connection between the user’s host and the client host.
+ 
+ 
+ 
+ 
+ 
+ 
+ 
