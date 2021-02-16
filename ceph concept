@@ -46,8 +46,19 @@
  The protection offered by this authentication is between the Ceph client and the Ceph server hosts. The authentication is not extended beyond the Ceph client. 
  If the user accesses the Ceph client from a remote host, Ceph authentication is not applied to the connection between the user’s host and the client host.
  
+ Ceph provides three types of clients: Ceph Block Device, Ceph File System, and Ceph Object Storage. A Ceph Client converts its data from the representation 
+ format it provides to its users (a block device image, RESTful objects, CephFS filesystem directories) into objects for storage in the Ceph Storage Cluster.
  
+ The objects Ceph stores in the Ceph Storage Cluster are not striped. Ceph Object Storage, Ceph Block Device, and the Ceph File System stripe their data over 
+ multiple Ceph Storage Cluster objects. Ceph Clients that write directly to the Ceph Storage Cluster via librados must perform the striping (and parallel I/O) 
+ for themselves to obtain these benefits.
  
+ Once the Ceph Client has striped data to stripe units and mapped the stripe units to objects, Ceph’s CRUSH algorithm maps the objects to placement groups, and 
+ the placement groups to Ceph OSD Daemons before the objects are stored as files on a storage drive.
+ 
+ Ceph’s Object Storage uses the term object to describe the data it stores. S3 and Swift objects are not the same as the objects that Ceph writes to 
+ the Ceph Storage Cluster. Ceph Object Storage objects are mapped to Ceph Storage Cluster objects. The S3 and Swift objects do not necessarily correspond in a 
+ 1:1 manner with an object stored in the storage cluster. It is possible for an S3 or Swift object to map to multiple Ceph objects.
  
  
  
