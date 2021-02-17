@@ -1,3 +1,4 @@
+ #### Architecture https://docs.ceph.com/en/latest/architecture/
  Ceph OSD Daemons handle read, write, and replication operations on storage drives. With the older Filestore back end, each RADOS object was stored as a separate 
  file on a conventional filesystem (usually XFS). With the new and default BlueStore back end, objects are stored in a monolithic database-like fashion.
  Ceph OSD Daemons store data as objects in a flat namespace (e.g., no hierarchy of directories). An object has an identifier, binary data, and metadata consisting 
@@ -60,6 +61,28 @@
  the Ceph Storage Cluster. Ceph Object Storage objects are mapped to Ceph Storage Cluster objects. The S3 and Swift objects do not necessarily correspond in a 
  1:1 manner with an object stored in the storage cluster. It is possible for an S3 or Swift object to map to multiple Ceph objects.
  
+ #### Ceph Storage Cluster https://docs.ceph.com/en/latest/rados/
+ Generally speaking, each OSD is backed by a single storage device, like a traditional hard disk (HDD) or solid state disk (SSD). OSDs can also be backed by a 
+ combination of devices, like a HDD for most data and an SSD (or partition of an SSD) for some metadata.
+ Ceph Monitor daemons manage critical cluster state like cluster membership and authentication informatio
  
+ # odd backends
+ There are two ways that OSDs can manage the data they store. Starting with the Luminous 12.2.z release, the new default (and recommended) backend is BlueStore. 
+ Prior to Luminous, the default (and only option) was Filestore.
+ 
+ All Ceph configuration options have a unique name consisting of words formed with lower-case characters and connected with underscore (_) characters.
+ 
+Each Ceph daemon, process, and library will pull its configuration from several sources, listed below. Sources later in the list will override those earlier in 
+the list when both are present.
+the compiled-in default value
+the monitor cluster’s centralized configuration database
+a configuration file stored on the local host
+environment variables
+command line arguments
+runtime overrides set by an administrator
+
+Ceph options that are stored in the monitor configuration database or in local configuration files are grouped into sections to indicate which daemons or clients 
+they apply to. global,mon,mgr,osd,mds,client are the sections.
+
  
  
