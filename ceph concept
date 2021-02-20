@@ -84,5 +84,88 @@ runtime overrides set by an administrator
 Ceph options that are stored in the monitor configuration database or in local configuration files are grouped into sections to indicate which daemons or clients 
 they apply to. global,mon,mgr,osd,mds,client are the sections.
 
+ You may deploy Ceph with a single monitor, but if the instance fails, the lack of other monitors may interrupt data service availability.
  
+ It is possible to run a Ceph Storage Cluster with two networks: a public (client, front-side) network and a cluster (private, replication, back-side) network. 
+ However, this approach complicates network configuration (both hardware and software) and does not usually have a significant impact on overall performance. 
+ For this reason, we recommend that for resilience and capacity dual-NIC systems either active/active bond these interfaces or implemebnt a layer 3 multipath 
+ strategy with eg. FRR
  
+ If you declare a cluster network, OSDs will route heartbeat, object replication and recovery traffic over the cluster network. This may improve performance 
+ compared to using a single network.We prefer that the cluster network is NOT reachable from the public network or the Internet for added security.
+ 
+ The messenger v2 protocol, or msgr2, is the second major revision on Ceph’s on-wire protocol.
+ # ceph mon dump
+0: [v2:10.0.0.10:3300/0,v1:10.0.0.10:6789/0] mon.foo
+1: [v2:10.0.0.11:3300/0,v1:10.0.0.11:6789/0] mon.bar
+2: [v2:10.0.0.12:3300/0,v1:10.0.0.12:6789/0] mon.baz
+The bracketed list or vector of addresses means that the same daemon can be reached on multiple ports (and protocols). Any client or other daemon connecting to 
+that daemon will use the v2 protocol (listed first) if possible; otherwise it will back to the legacy v1 protocol. Legacy clients will only see the v1 addresses 
+and will continue to connect as they did before, with the v1 protocol.
+
+The cephx protocol is enabled by default. Cryptographic authentication has some computational costs, though they should generally be quite low. If the network 
+environment connecting your client and server hosts is very safe and you cannot afford authentication, you can turn it off. This is not generally recommended.
+
+Ceph Monitors maintain a “master copy” of the Cluster Map, which means a Ceph Client can determine the location of all Ceph Monitors, Ceph OSD Daemons, and 
+Ceph Metadata Servers just by connecting to one Ceph Monitor and retrieving a current cluster map.
+With a current copy of the cluster map and the CRUSH algorithm, a Ceph Client can compute the location for any object.
+ 
+The primary role of the Ceph Monitor is to maintain a master copy of the cluster map. Ceph Monitors also provide authentication and logging services.
+When there is a significant change in the state of the cluster–e.g., a Ceph OSD Daemon goes down, a placement group falls into a degraded state, etc.–the 
+cluster map gets updated to reflect the current state of the cluster.Additionally, the Ceph Monitor also maintains a history of the prior states of the cluster. 
+The monitor map, OSD map, placement group map and metadata server map each maintain a history of their map versions. We call each version an “epoch.”
+
+Ceph Clients and other Ceph daemons use the Ceph configuration file to discover monitors, monitors discover each other using the monitor map (monmap), not the 
+Ceph configuration file.
+
+Each Ceph Storage Cluster has a unique identifier (fsid). If specified, it usually appears under the [global] section of the configuration file. Deployment tools 
+usually generate the fsid and store it in the monitor map, so the value may not appear in a configuration file. The fsid makes it possible to run daemons for 
+multiple clusters on the same hardware.
+
+When a Ceph Storage Cluster gets close to its maximum capacity (see``mon_osd_full ratio``), Ceph prevents you from writing to or reading from OSDs as a safety 
+easure to prevent data loss. Therefore, letting a production Ceph Storage Cluster approach its full ratio is not a good practice, because it sacrifices 
+high availability
+
+# read https://docs.ceph.com/en/latest/rados/configuration/mon-config-ref/?#storage-capacity for capacity planning
+if some OSDs are nearfull, but others have plenty of capacity, you may have an inaccurate CRUSH weight set for the nearfull OSDs.
+
+Ceph monitors know about the cluster by requiring reports from each OSD, and by receiving reports from OSDs about the status of their neighboring OSDs.
+
+When you run a production cluster with multiple monitors (recommended), each monitor checks to see if a neighboring monitor has a more recent version of 
+the cluster map.Periodically, one monitor in the cluster may fall behind the other monitors to the point where it must leave the quorum, synchronize to retrieve 
+the most current information about the cluster, and then rejoin the quorum.
+
+Ceph daemons pass critical messages to each other, which must be processed before daemons reach a timeout threshold. If the clocks in Ceph monitors are not 
+synchronized, it can lead to a number of anomalies. For example:
+Daemons ignoring received messages (e.g., timestamps outdated)
+Timeouts triggered too soon/late when a message wasn’t received in time.
+
+LOOKING UP MONITORS THROUGH DNS. This way daemons and clients do not require a mon host configuration directive in their ceph.conf configuration file.This way 
+daemons and clients do not require a mon host configuration directive in their ceph.conf configuration file.
+
+Ceph ensures data integrity by scrubbing placement groups. Ceph scrubbing is analogous to fsck on the object storage layer. For each placement group, 
+Ceph generates a catalog of all objects and compares each primary object and its replicas to ensure that no objects are missing or mismatched. 
+Light scrubbing (daily) checks the object size and attributes. Deep scrubbing (weekly) reads the data and uses checksums to ensure data integrity.
+
+Scrubbing is important for maintaining data integrity, but it can reduce performance. 
+
+ceph use mclock for QOS.
+
+When you add or remove Ceph OSD Daemons to a cluster, CRUSH will rebalance the cluster by moving placement groups to or from Ceph OSDs to restore balanced 
+utilization. The process of migrating placement groups and the objects they contain can reduce the cluster’s operational performance considerably. 
+To maintain operational performance, Ceph performs this migration with ‘backfilling’, which allows Ceph to set backfill operations to a lower priority than 
+requests to read or write data.
+
+If a Ceph OSD Daemon crashes and comes back online, usually it will be out of sync with other Ceph OSD Daemons containing more recent versions of objects in the 
+placement groups. When this happens, the Ceph OSD Daemon goes into recovery mode and seeks to get the latest copy of the data and bring its map back up to date. 
+Depending upon how long the Ceph OSD Daemon was down, the OSD’s objects and placement groups may be significantly out of date. Also, if a failure domain went 
+down (e.g., a rack), more than one Ceph OSD Daemon may come back online at the same time. This can make the recovery process time consuming and resource intensive.
+
+Filestore OSDs use a journal for two reasons: speed and consistency. Note that since Luminous, the BlueStore OSD back end has been preferred and default. 
+This information is provided for pre-existing OSDs and for rare situations where Filestore is preferred for new deployments.
+
+When you create pools and set the number of placement groups (PGs) for each, Ceph uses default values when you don’t specifically override the defaults. 
+We recommend overriding some of the defaults. Specifically, we recommend setting a pool’s replica size and overriding the default number of placement groups.
+
+
+
