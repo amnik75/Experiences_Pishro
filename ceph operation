@@ -20,3 +20,37 @@ and are discarded/lost if the daemon or process restarts.
 ceph tell <name> config set <option> <value>
 ceph daemon <name> config set <option> <value>
 Note that in the ceph config show command output these temporary values will be shown with a source of override.
+
+### Ceph Operation https://docs.ceph.com/en/latest/rados/operations/
+#start all daemon
+sudo systemctl start ceph.target
+#stop all daemon
+sudo systemctl stop ceph\*.service ceph\*.target
+
+#To start all daemons of a particular type on a Ceph Node, execute one of the following:
+sudo systemctl start ceph-osd.target
+sudo systemctl start ceph-mon.target
+sudo systemctl start ceph-mds.target
+
+#To stop all daemons of a particular type on a Ceph Node, execute one of the following:
+sudo systemctl stop ceph-mon\*.service ceph-mon.target
+sudo systemctl stop ceph-osd\*.service ceph-osd.target
+sudo systemctl stop ceph-mds\*.service ceph-mds.target
+
+To start/stop a specific daemon instance on a Ceph Node, execute one of the following:
+sudo systemctl start/stop ceph-osd@{id}
+sudo systemctl start/stop ceph-mon@{hostname}
+sudo systemctl start/stop ceph-mds@{hostname}
+
+# Utilization by pool can be checked with
+ceph df
+ceph osd dump | grep full_ratio
+
+ceph osd set <flag>
+ceph osd unset <flag>
+<flag>: full pause noup nodown noin noout nobackfill, norecover norebalance noscrub nodeep_scrub  notieragent
+
+ceph osd set-group <flags> <who>
+ceph osd unset-group <flags> <who>
+<flag>: noup nodown noin noout 
+<who>: osd.0,osd.1,...
