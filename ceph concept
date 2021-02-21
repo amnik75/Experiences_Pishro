@@ -167,5 +167,17 @@ This information is provided for pre-existing OSDs and for rare situations where
 When you create pools and set the number of placement groups (PGs) for each, Ceph uses default values when you don’t specifically override the defaults. 
 We recommend overriding some of the defaults. Specifically, we recommend setting a pool’s replica size and overriding the default number of placement groups.
 
+One or more monitor daemons is currently down. The cluster requires a majority (more than 1/2) of the monitors in order to function. When one or more monitors 
+are down, clients may have a harder time forming their initial connection to the cluster as they may need to try more addresses before they reach an 
+operating monitor.
 
+The cluster should normally have at least one running manager (ceph-mgr) daemon. If no manager daemon is running, 
+the cluster’s ability to monitor itself will be compromised, and parts of the management API will become unavailable (for example, the dashboard will not work, 
+and most CLI commands that report metrics or runtime state will block). However, the cluster will still be able to perform all IO operations and recover from 
+failures.
+The down manager daemon should generally be restarted as soon as possible to ensure that the cluster can be monitored (e.g., so that the ceph -s information is 
+up to date, and/or metrics can be scraped by Prometheus).
+
+The utilization thresholds for nearfull, backfillfull, full, and/or failsafe_full are not ascending. In particular, we expect 
+nearfull < backfillfull, backfillfull < full, and full < failsafe_full.
 
