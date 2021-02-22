@@ -54,3 +54,9 @@ ceph osd set-group <flags> <who>
 ceph osd unset-group <flags> <who>
 <flag>: noup nodown noin noout 
 <who>: osd.0,osd.1,...
+
+# Detailed information about which PGs are affected is available from:
+ceph health detail
+
+# the state of specific problematic PGs can be queried with:
+ceph tell <pgid> query
