@@ -88,3 +88,21 @@ openstack usage list
 
 use rsync to backup the directory to another server
 Backup and subsequent recovery is one of the first tasks system administrators learn
+
+### miscellaneous
+live migration: https://docs.openstack.org/nova/ussuri/admin/live-migration-usage.html if does not work force it.
+dead migration: shutdown the server then migrate it then verify resize.
+
+to migrate from dc1 to dc2: stop server, find the image of server in nova pool then export it from ceph, then send exported disk to dc2, then create server in dc2,
+then delete the image server created in
+ceph, then replace it with import it in ceph. the cpu flags of machines should be identical for live migration.
+
+you should qemu-info image before create it in glance beacause you should set type in image create
+
+openstack server restore <server> # use this command for take back the soft deleted vms
+
+openstack server backup create <server> # use this to save backup of the server in glance
+openstack server rebuild --image <backup> <server> use this to rebuild the server with it's backup image to restore
+
+
+
