@@ -57,6 +57,42 @@ ceph osd unset-group <flags> <who>
 
 # Detailed information about which PGs are affected is available from:
 ceph health detail
-
 # the state of specific problematic PGs can be queried with:
 ceph tell <pgid> query
+
+ceph osd in <osd id(s)>
+
+# The request queue for the daemon in question can be queried with the following command, executed from the daemon’s host:
+ceph daemon osd.<id> ops
+# A summary of the slowest recent requests can be seen with:
+ceph daemon osd.<id> dump_historic_ops
+# The location of an OSD can be found with:
+ceph osd find osd.<id>
+
+# You can manually initiate a scrub of a clean PG with:
+ceph pg scrub <pgid>
+ceph pg deep-scrub <pgid>
+
+# New crashes can be listed with:
+ceph crash ls-new
+# Information about a specific crash can be examined with:
+ceph crash info <crash-id>
+# This warning can be silenced by “archiving” the crash (perhaps after being examined by an administrator) so that it does not generate this warning:
+ceph crash archive <crash-id>
+# Similarly, all new crashes can be archived with:
+ceph crash archive-all
+
+#The telemetry module sends anonymous data about the cluster back to the Ceph developers to help understand how Ceph is used and what problems users may be 
+experiencing.
+ceph telemetry show
+
+ceph
+ceph> health
+ceph> status
+ceph> quorum_status
+ceph> mon stat
+
+#In addition to local logging by each daemon, Ceph clusters maintain a cluster log that records high level events about the whole system. This is logged to disk 
+on monitor servers (as /var/log/ceph/ceph.log by default), but can also be monitored via the command line.
+ceph -w
+In addition to using ceph -w to print log lines as they are emitted, use ceph log last [n] to see the most recent n lines from the cluster log.
