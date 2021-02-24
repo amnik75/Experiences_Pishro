@@ -210,4 +210,10 @@ recent cluster change has not yet completed.
 Misplaced data is not a dangerous condition in and of itself; data consistency is never at risk, and old copies of objects are never removed until the desired 
 number of new copies (in the desired locations) are present.
 
+High availability and high reliability require a fault-tolerant approach to managing hardware and software issues. Ceph has no single point-of-failure, and can 
+service requests for data in a “degraded” mode. Ceph’s data placement introduces a layer of indirection to ensure that data doesn’t bind directly to particular 
+OSD addresses. This means that tracking down system faults requires finding the placement group and the underlying OSDs at root of the problem.
+
+# Tip A fault in one part of the cluster may prevent you from accessing a particular object, but that doesn’t mean that you cannot access other objects. When you 
+run into a fault, don’t panic. Just follow the steps for monitoring your OSDs and placement groups. Then, begin troubleshooting.
 
