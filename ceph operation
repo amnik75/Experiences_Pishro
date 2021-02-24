@@ -92,7 +92,39 @@ ceph> status
 ceph> quorum_status
 ceph> mon stat
 
-#In addition to local logging by each daemon, Ceph clusters maintain a cluster log that records high level events about the whole system. This is logged to disk 
+# In addition to local logging by each daemon, Ceph clusters maintain a cluster log that records high level events about the whole system. This is logged to disk 
 on monitor servers (as /var/log/ceph/ceph.log by default), but can also be monitored via the command line.
 ceph -w
 In addition to using ceph -w to print log lines as they are emitted, use ceph log last [n] to see the most recent n lines from the cluster log.
+ceph log last [n]
+
+# The following command will show all gathered network performance data by specifying a threshold of 0 and sending to the mgr.
+ceph daemon /var/run/ceph/ceph-mgr.x.asok dump_osd_network 0
+
+# Health checks can be muted so that they do not affect the overall reported status of the cluster. 
+ceph health mute <code>
+A mute can be explicitly removed with:
+ceph health unmute <code>
+
+# To check a cluster’s data usage and data distribution among pools, you can use the df option. It is similar to Linux df
+ceph df 
+ceph df detail
+
+# You can check OSDs to ensure they are up and in by executing the following command:
+ceph osd stat
+ceph osd dump
+ceph osd tree
+
+# To see display the monitor map, execute the following:
+ceph mon stat
+ceph mon dump
+ceph quorum_status
+
+# The Ceph admin socket allows you to query a daemon via a socket interface. By default, Ceph sockets reside under /var/run/ceph. To access a daemon via the 
+admin socket, login to the host running the daemon and use the following command:
+ceph daemon {daemon-name}
+ceph daemon {path-to-socket-file}
+
+#To view the available admin socket commands, execute the following command:
+ceph daemon {daemon-name} help
+
