@@ -128,3 +128,20 @@ ceph daemon {path-to-socket-file}
 #To view the available admin socket commands, execute the following command:
 ceph daemon {daemon-name} help
 
+# To retrieve a list of placement groups, execute:
+ceph pg dump
+
+# to view which OSDs are within the Acting Set or the Up Set for a given placement group, execute:
+ceph pg map {pg-num}
+
+ceph pg stat
+ceph ods lspools
+
+To query a particular placement group, execute the following:
+ceph pg {poolnum}.{pg-id} query
+
+# To identify stuck placement groups, execute the following:
+ceph pg dump_stuck [unclean|inactive|stale|undersized|degraded]
+
+# To find the object location, all you need is the object name and the pool name
+ceph osd map {poolname} {object-name} [namespace]
