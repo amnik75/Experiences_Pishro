@@ -145,3 +145,36 @@ ceph pg dump_stuck [unclean|inactive|stale|undersized|degraded]
 
 # To find the object location, all you need is the object name and the pool name
 ceph osd map {poolname} {object-name} [namespace]
+
+If you do not specify a user name, Ceph will use client.admin as the default user name. If you do not specify a keyring, Ceph will look for a keyring via the 
+keyring setting in the Ceph configuration
+ceph health = ceph -n client.admin --keyring=/etc/ceph/ceph.client.admin.keyring health
+
+# To list the users in your cluster, execute the following:
+ceph auth ls
+
+# To retrieve a specific user, key and capabilities, execute the following:
+ceph auth get {TYPE.ID}
+
+# COMMANDS FOR DIAGNOSING PLACEMENT-GROUP PROBLEMS
+ceph health detail
+The following command provides more detail on the status of the placement groups:
+ceph pg dump --format=json-pretty
+The following command lists inconsistent placement groups
+rados list-inconsistent-pg {pool}
+The following command lists inconsistent rados objects:
+rados list-inconsistent-obj {pgid}
+The following command lists inconsistent snapsets in the given placement group:
+rados list-inconsistent-snapset {pgid}
+
+To show a pool’s utilization statistics, execute:
+rados df
+Additionally, to obtain I/O information for a specific pool or all, execute:
+ceph osd pool stats [{pool-name}]
+
+To get a value from a pool, execute the following:
+ceph osd pool get {pool-name} {key}
+
+You can view each pool, its relative utilization, and any suggested changes to the PG count with this command:
+ceph osd pool autoscale-status
+
