@@ -284,3 +284,36 @@ Inactive: Placement groups cannot process reads or writes because they are waiti
 Stale: Placement groups are in an unknown state, because the OSDs that host them have not reported to the monitor cluster in a while (configured by mon osd 
 report timeout).
 
+Users are either individuals or system actors such as applications, which use Ceph clients to interact with the Ceph Storage Cluster daemons.
+
+Ceph has the notion of a type of user. For the purposes of user management, the type will always be client. Ceph identifies users in period (.) delimited form 
+consisting of the user type and the user ID: for example, TYPE.ID, client.admin, or client.user1. The reason for user typing is that Ceph Monitors, OSDs, and 
+Metadata Servers also use the Cephx protocol, but they are not clients. Distinguishing the user type helps to distinguish between client users and other 
+users–streamlining access control, user monitoring and traceability.
+
+A pool is a logical partition where users store data. In Ceph deployments, it is common to create a pool as a logical partition for similar types of data. For 
+example, when deploying Ceph as a backend for OpenStack, a typical deployment would have pools for volumes, images, backups and virtual machines, and users such 
+as client.glance, client.cinder, etc.
+
+Objects within a pool can be associated to a namespace–a logical group of objects within the pool. A user’s access to a pool can be associated with a namespace 
+such that reads and writes by the user take place only within the namespace. Objects written to a namespace within the pool can only be accessed by users who 
+have access to the namespace.
+
+When you access Ceph via a Ceph client, the Ceph client will look for a local keyring. Ceph presets the keyring setting with the following four keyring names by 
+default so you don’t have to set them in your Ceph configuration file unless you want to override the defaults (not recommended):
+/etc/ceph/$cluster.$name.keyring
+/etc/ceph/$cluster.keyring
+/etc/ceph/keyring
+/etc/ceph/keyring.bin
+The $cluster metavariable is your Ceph cluster name as defined by the name of the Ceph configuration file (i.e., ceph.conf means the cluster name is ceph; thus, 
+ceph.keyring). The $name metavariable is the user type and user ID (e.g., client.admin; thus, ceph.client.admin.keyring).
+
+Ceph stores and updates the checksums of objects stored in the cluster. When a scrub is performed on a placement group, the OSD attempts to choose an 
+authoritative copy from among its replicas. Among all of the possible cases, only one case is consistent. After a deep scrub, Ceph calculates the checksum of an 
+object read from the disk and compares it to the checksum previously recorded. If the current checksum and the previously recorded checksums do not match, that 
+is an inconsistency. In the case of replicated pools, any mismatch between the checksum of any replica of an object and the checksum of the authoritative copy 
+means that there is an inconsistency.
+
+Erasure coded pools require more resources than replicated pools and lack some functionalities such as omap. but it consume less storage than replicated pool.
+
+Ceph OSD Daemons perform optimally when all storage drives in the rule are of the same size, speed (both RPMs and throughput) and type
