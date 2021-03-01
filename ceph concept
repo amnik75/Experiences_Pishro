@@ -317,3 +317,5 @@ means that there is an inconsistency.
 Erasure coded pools require more resources than replicated pools and lack some functionalities such as omap. but it consume less storage than replicated pool.
 
 Ceph OSD Daemons perform optimally when all storage drives in the rule are of the same size, speed (both RPMs and throughput) and type
+
+Backfill is a special case of recovery.
