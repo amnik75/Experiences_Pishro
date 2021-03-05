@@ -186,3 +186,5 @@ ceph device info <devid>
 approximately the same amount of data. ceph osd reweight sets an override weight on the OSD. This value is in the range 0 to 1, and forces CRUSH to re-place 
 (1-weight) of the data that would otherwise live on this drive.
 ceph osd reweight {osd-num} {weight}
+
+# link for command ref: https://docs.ceph.com/en/latest/rados/operations/control/#
