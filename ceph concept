@@ -319,3 +319,33 @@ Erasure coded pools require more resources than replicated pools and lack some f
 Ceph OSD Daemons perform optimally when all storage drives in the rule are of the same size, speed (both RPMs and throughput) and type
 
 Backfill is a special case of recovery.
+
+A placement group (PG) aggregates objects within a pool because tracking object placement and object metadata on a per-object basis is computationally 
+expensive–i.e., a system with millions of objects cannot realistically track placement on a per-object basis.
+
+It is advisable to run an odd number of monitors. An odd number of monitors is more resilient than an even number. For instance, with a two monitor deployment, 
+no failures can be tolerated and still maintain a quorum; with three monitors, one failure can be tolerated; in a four monitor deployment, one failure can be 
+tolerated; with five monitors, two failures can be tolerated. This avoids the dreaded split brain phenomenon, and is why an odd number is best. In short, Ceph 
+needs a majority of monitors to be active (and able to communicate with each other), but that majority can be achieved using a single monitor, or 
+2 out of 2 monitors, 2 out of 3, 3 out of 4, etc.
+
+Since monitors are lightweight, it is possible to run them on the same host as OSDs; however, we recommend running them on separate hosts, because fsync issues 
+with the kernel may impair performance. Dedicated monitor nodes also minimize disruption since monitor and OSD daemons are not inactive at the same time when a 
+node crashes or is taken down for maintenance.
+
+Dedicated monitor nodes also make for cleaner maintenance by avoiding both OSDs and a mon going down if a node is rebooted, taken down, or crashes.
+
+A monitor always refers to the local copy of the monmap when discovering other monitors in the cluster. Using the monmap instead of ceph.conf avoids errors that 
+could break the cluster (e.g., typos in ceph.conf when specifying a monitor address or port).
+the monmap provides monitors with a strict guarantee that their consensus is valid.
+
+Strict consistency also applies to updates to the monmap. As with any other updates on the monitor, changes to the monmap always run through a distributed 
+consensus algorithm called Paxos. The monitors must agree on each update to the monmap, such as adding or removing a monitor, to ensure that each monitor in the 
+quorum has the same version of the monmap. Updates to the monmap are incremental so that monitors have the latest agreed upon version, and a set of previous 
+versions, allowing a monitor that has an older version of the monmap to catch up with the current state of the cluster.
+
+If monitors discovered each other through the Ceph configuration file instead of through the monmap, it would introduce additional risks because the 
+Ceph configuration files are not updated and distributed automatically.
+
+Each OSD can run either BlueStore or FileStore, and a single Ceph cluster can contain a mix of both. Users who have previously deployed FileStore are likely to 
+want to transition to BlueStore in order to take advantage of the improved performance and robustness.
