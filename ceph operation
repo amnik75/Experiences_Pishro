@@ -192,3 +192,12 @@ ceph osd reweight {osd-num} {weight}
 # to see report of cluster use this command:
 ceph report
 
+If the answer is yes then your cluster is up and running. One thing you can take for granted is that the monitors will only answer to a status request if there 
+is a formed quorum. Also check that at least one mgr daemon is reported as running, ideally all of them.
+
+If ceph -s hangs without obtaining a reply from the cluster or showing fault messages, then it is likely that your monitors are either down completely or just a 
+raction are up – a fraction insufficient to form a majority quorum. This check will connect to an arbitrary mon;
+
+# You can contact each monitor individually asking them for their status, regardless of a quorum being formed. This can be achieved using 
+ceph tell mon.ID mon_status, ID being the monitor’s identifier. You should perform this for each monitor in the cluster.
+ceph tell mon.ID mon_status
