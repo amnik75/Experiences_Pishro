@@ -188,3 +188,7 @@ approximately the same amount of data. ceph osd reweight sets an override weight
 ceph osd reweight {osd-num} {weight}
 
 # link for command ref: https://docs.ceph.com/en/latest/rados/operations/control/#
+
+# to see report of cluster use this command:
+ceph report
+
