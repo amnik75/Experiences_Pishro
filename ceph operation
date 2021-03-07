@@ -201,3 +201,24 @@ raction are up – a fraction insufficient to form a majority quorum. This check
 # You can contact each monitor individually asking them for their status, regardless of a quorum being formed. This can be achieved using 
 ceph tell mon.ID mon_status, ID being the monitor’s identifier. You should perform this for each monitor in the cluster.
 ceph tell mon.ID mon_status
+
+#  Check your networks to ensure they are running properly, because networks may have a significant impact on OSD operation and performance. Look for 
+dropped packets on the host side and CRC errors on the switch side.
+
+Periodically, you may need to perform maintenance on a subset of your cluster, or resolve a problem that affects a failure domain (e.g., a rack). If you do not 
+want CRUSH to automatically rebalance the cluster as you stop OSDs for maintenance, set the cluster to noout first:
+ceph osd set noout
+# On Luminous or newer releases it is safer to set the flag only on affected OSDs. You can do this individually
+ceph osd add-noout osd.0
+ceph osd rm-noout  osd.0
+Once the flag is set you can stop the OSDs and any other colocated Ceph services within the failure domain that requires maintenance work.
+systemctl stop ceph\*.service ceph\*.target
+Once you have completed your maintenance, restart the OSDs and any other daemons. If you rebooted the host as part of the maintenance, these should come back on 
+their own without intervention.
+ceph osd unset noout
+ceph osd unset-group noout prod-ceph-data1701
+
+if you run ceph daemon osd.<id> dump_historic_ops or ceph daemon osd.<id> dump_ops_in_flight, you will see a set of operations and a list of events each 
+operation went through.
+
+
