@@ -349,3 +349,9 @@ Ceph configuration files are not updated and distributed automatically.
 
 Each OSD can run either BlueStore or FileStore, and a single Ceph cluster can contain a mix of both. Users who have previously deployed FileStore are likely to 
 want to transition to BlueStore in order to take advantage of the improved performance and robustness.
+
+When common networking technloogies were 100Mb/s and 1Gb/s, this separation of public and private was often critical. With today’s 10Gb/s, 40Gb/s, and 25/50/100Gb/s networks, 
+the above capacity concerns are often diminished or even obviated. For example, if your OSD nodes have two network ports, dedicating one to the public and the 
+other to the private network means no path redundancy. This degrades your ability to weather network maintenance and failures without significant cluster or 
+client impact. Consider instead using both links for just a public network: with bonding (LACP) or equal-cost routing (e.g. FRR) you reap the benefits of 
+increased throughput headroom, fault tolerance, and reduced OSD flapping.
