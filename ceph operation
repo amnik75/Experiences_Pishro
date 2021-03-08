@@ -221,4 +221,12 @@ ceph osd unset-group noout prod-ceph-data1701
 if you run ceph daemon osd.<id> dump_historic_ops or ceph daemon osd.<id> dump_ops_in_flight, you will see a set of operations and a list of events each 
 operation went through.
 
+ceph pg {pgid} query
+
+# If all possible locations have been queried and objects are still lost, you may have to give up on the lost objects. This, again, is possible given unusual 
+combinations of failures that allow the cluster to learn about writes that were performed before the writes themselves are recovered. To mark the 
+“unfound” objects as “lost”:
+ceph pg {pgid} mark_unfound_lost revert|delete
+
+
 
