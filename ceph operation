@@ -236,4 +236,40 @@ ceph tell osd.0 config set debug_osd 0/5
 configuration you’d like to change using ceph daemon. For example:
 sudo ceph daemon osd.0 config set debug_osd 0/5
 
+### Ceph block device https://docs.ceph.com/en/latest/rbd/rados-rbd-cmds/
+
+# To list block devices in a particular pool, execute the following:
+rbd ls {poolname}
+
+# To retrieve information from an image within a pool, execute the following, but replace {image-name} with the name of the image and replace {pool-name} with the 
+name of the pool:
+rbd info {pool-name}/{image-name}
+
+# Ceph Block Device images are thin provisioned. They don’t actually use any physical storage until you begin saving data to them. However, they do have a maximum 
+capacity that you set with the --size option. If you want to increase (or decrease) the maximum size of a Ceph Block Device image, execute the following:
+rbd resize --size 2048 foo (to increase)
+rbd resize --size 2048 foo --allow-shrink (to decrease)
+
+# To remove a block device from a pool, execute the following, but replace {image-name} with the name of the image to remove and replace {pool-name} with the 
+name of the pool:
+rbd rm {pool-name}/{image-name}
+
+To list deferred delete block devices in a particular pool, execute the following, but replace {poolname} with the name of the pool:
+rbd trash ls {poolname}
+
+To defer delete a block device from a pool, execute the following, but replace {image-name} with the name of the image to move and replace {pool-name} with the 
+name of the pool:
+rbd trash mv {pool-name}/{image-name}
+
+To restore a deferred delete block device in a particular pool, execute the following, but replace {image-id} with the id of the image and replace {pool-name} 
+with the name of the pool:
+rbd trash restore {pool-name}/{image-id}
+
+
+
+
+
+
+
+
 
