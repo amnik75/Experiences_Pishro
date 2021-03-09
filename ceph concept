@@ -361,3 +361,9 @@ if your OSDs are running fine, but your metadata servers are not, you should sta
 you trouble. Enable logging for each subsystem as needed.
 
 Verbose logging can generate over 1GB of data per hour. If your OS disk reaches its capacity, the node will stop working.
+
+### Ceph block device https://docs.ceph.com/en/latest/rbd/rados-rbd-cmds/
+Ceph block devices are thin-provisioned, resizable, and store data striped over multiple OSDs. Ceph block devices leverage RADOS capabilities including 
+snapshotting, replication and strong consistency. Ceph block storage clients communicate with Ceph clusters through kernel modules or the librbd library.
+Ceph’s block devices deliver high performance with vast scalability to kernel modules, or to KVMs such as QEMU, and cloud-based computing systems like OpenStack 
+and CloudStack that rely on libvirt and QEMU to integrate with Ceph block devices.
