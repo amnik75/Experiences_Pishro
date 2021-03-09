@@ -355,3 +355,9 @@ the above capacity concerns are often diminished or even obviated. For example, 
 other to the private network means no path redundancy. This degrades your ability to weather network maintenance and failures without significant cluster or 
 client impact. Consider instead using both links for just a public network: with bonding (LACP) or equal-cost routing (e.g. FRR) you reap the benefits of 
 increased throughput headroom, fault tolerance, and reduced OSD flapping.
+
+Logging is resource intensive. If you are encountering a problem in a specific area of your cluster, enable logging for that area of the cluster. For example, 
+if your OSDs are running fine, but your metadata servers are not, you should start by enabling debug logging for the specific metadata server instance(s) giving 
+you trouble. Enable logging for each subsystem as needed.
+
+Verbose logging can generate over 1GB of data per hour. If your OS disk reaches its capacity, the node will stop working.
