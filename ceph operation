@@ -267,6 +267,50 @@ rbd trash restore {pool-name}/{image-id}
 
 
 
+When cephx authentication is enabled (it is by default), you must specify a user name or ID and a path to the keyring containing the corresponding key.
+rbd --id {user-ID} --keyring=/path/to/secret [commands]
+rbd --name {username} --keyring=/path/to/secret [commands]
+
+To create a snapshot with rbd, specify the snap create option, the pool name and the image name.
+rbd snap create {pool-name}/{image-name}@{snap-name}
+
+# To rollback to a snapshot with rbd, specify the snap rollback option, the pool name, the image name and the snap name.
+rbd snap rollback {pool-name}/{image-name}@{snap-name}
+
+Rolling back an image to a snapshot means overwriting the current version of the image with data from a snapshot. The time it takes to execute a rollback 
+increases with the size of the image. It is faster to clone from a snapshot than to rollback an image to a snapshot, and is the preferred method of returning to 
+a pre-existing state.
+
+# To delete a snapshot with rbd, specify the snap rm subcommand, the pool name, the image name and the snap name.
+rbd snap rm {pool-name}/{image-name}@{snap-name}
+Ceph OSDs delete data asynchronously, so deleting a snapshot doesn’t immediately free up the underlying OSDs’ capacity.
+
+# To delete all snapshots for an image with rbd, specify the snap purge subcommand and the image name.
+rbd snap purge {pool-name}/{image-name}
+
+# Clones access the parent snapshots. All clones would break if a user inadvertently deleted the parent snapshot. To prevent data loss, you MUST protect the 
+snapshot before you can clone it.
+rbd snap protect {pool-name}/{image-name}@{snapshot-name}
+
+# To clone a snapshot, specify you need to specify the parent pool, image and snapshot; and, the child pool and image name. You must protect the snapshot before 
+you can clone it.
+rbd clone {pool-name}/{parent-image}@{snap-name} {pool-name}/{child-image-name}
+
+Before you can delete a snapshot, you must unprotect it first. Additionally, you may NOT delete snapshots that have references from clones. You must flatten 
+each clone of a snapshot, before you can delete the snapshot.
+rbd snap unprotect {pool-name}/{image-name}@{snapshot-name}
+
+# To list the children of a snapshot, execute the following:
+rbd children {pool-name}/{image-name}@{snapshot-name}
+
+# Cloned images retain a reference to the parent snapshot. When you remove the reference from the child clone to the parent snapshot, you effectively “flatten” the 
+image by copying the information from the snapshot to the clone. The time it takes to flatten a clone increases with the size of the snapshot. To delete a 
+snapshot, you must flatten the child images first.
+rbd flatten {pool-name}/{image-name}
+
+
+
+
 
 
 
