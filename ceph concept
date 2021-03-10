@@ -386,6 +386,14 @@ performed these steps, you can begin cloning the snapshot.
 The cloned image has a reference to the parent snapshot, and includes the pool ID, image ID and snapshot ID. The inclusion of the pool ID means that you may 
 clone snapshots from one pool to images in another pool.
 
+Exclusive locks are a mechanism designed to prevent multiple processes from accessing the same Rados Block Device (RBD) in an uncoordinated fashion. 
+Exclusive locks are heavily used in virtualization (where they prevent VMs from clobbering each others’ writes), and also in RBD mirroring 
+(where they are a prerequisite for journaling).
+
+Note that it is perfectly possible for two or more concurrently running processes to merely open the image, and also to read from it. The client acquires the 
+exclusive lock only when attempting to write to the image.
+
+
 
 
 
