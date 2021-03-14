@@ -393,7 +393,16 @@ Exclusive locks are heavily used in virtualization (where they prevent VMs from 
 Note that it is perfectly possible for two or more concurrently running processes to merely open the image, and also to read from it. The client acquires the 
 exclusive lock only when attempting to write to the image.
 
+RBD images can be asynchronously mirrored between two Ceph clusters.
 
+RBD images can be live-migrated between different pools within the same cluster; between different image formats and layouts; or from external data sources. 
+When started, the source will be deep-copied to the destination image, pulling all snapshot history while preserving the sparse allocation of data where possible.
+
+Cloned RBD images usually modify only a small fraction of the parent image. For example, in a VDI use-case, VMs are cloned from the same base image and initially 
+differ only by hostname and IP address. During booting, all of these VMs read portions of the same parent image data. If we have a local cache of the parent image,
+this speeds up reads on the caching host. We also achieve reduction of client-to-cluster network traffic. RBD cache must be explicitly enabled in ceph.conf. 
+The ceph-immutable-object-cache daemon is responsible for caching the parent content on the local disk, and future reads on that data will be serviced from the 
+local cache.
 
 
 
