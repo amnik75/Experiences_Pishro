@@ -404,6 +404,11 @@ this speeds up reads on the caching host. We also achieve reduction of client-to
 The ceph-immutable-object-cache daemon is responsible for caching the parent content on the local disk, and future reads on that data will be serviced from the 
 local cache.
 
+The persistent write-back cache provides a persistent, fault-tolerant write-back cache for librbd-based RBD clients.
+
+Starting with the Pacific release, image-level encryption can be handled internally by RBD clients. This means you can set a secret key that will be used to 
+encrypt a specific RBD image.
+
 
 
 
