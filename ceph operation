@@ -308,6 +308,16 @@ image by copying the information from the snapshot to the clone. The time it tak
 snapshot, you must flatten the child images first.
 rbd flatten {pool-name}/{image-name}
 
+Use rbd to map an image name to a kernel module. You must specify the image name, the pool name, and the user name. rbd will load RBD kernel module on your 
+behalf if it’s not already loaded.
+sudo rbd device map {pool-name}/{image-name} --id {user-name}
+
+# To show block device images mapped to kernel modules with the rbd, specify device list arguments.
+rbd device list
+
+# To unmap a block device image with the rbd command, specify the device unmap arguments and the device name (i.e., by convention the same as the block device 
+image name).
+sudo rbd device unmap /dev/rbd/{poolname}/{imagename}
 
 
 
