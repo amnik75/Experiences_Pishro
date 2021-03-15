@@ -409,6 +409,28 @@ The persistent write-back cache provides a persistent, fault-tolerant write-back
 Starting with the Pacific release, image-level encryption can be handled internally by RBD clients. This means you can set a secret key that will be used to 
 encrypt a specific RBD image.
 
+The most frequent Ceph Block Device use case involves providing block device images to virtual machines. For example, a user may create a “golden” image with an 
+OS and any relevant software in an ideal configuration. Then the user takes a snapshot of the image. Finally the user clones the snapshot (potentially many times).
+See Snapshots for details. The ability to make copy-on-write clones of a snapshot means that Ceph can provision block device images to virtual machines quickly, 
+because the client doesn’t have to download the entire image each time it spins up a new virtual machine.
+
+# The libvirt library creates a virtual machine abstraction layer between hypervisor interfaces and the software applications that use them. With libvirt, 
+developers and system administrators can focus on a common management framework, common API, and common shell interface (i.e., virsh) to many different 
+hypervisors
+
+Ceph block devices support QEMU/KVM. You can use Ceph block devices with software that interfaces with libvirt.
+The most common libvirt use case involves providing Ceph block devices to cloud solutions like OpenStack or CloudStack. The cloud solution uses libvirt to 
+interact with QEMU/KVM, and QEMU/KVM interacts with Ceph block devices via librbd.
+
+You can attach Ceph Block Device images to OpenStack instances through libvirt, which configures the QEMU interface to librbd. Ceph stripes block volumes across 
+multiple OSDs within the cluster, which means that large volumes can realize better performance than local drives on a standalone server!
+
+You may store images in Ceph block devices while running VMs using a local disk, or vice versa.
+Using QCOW2 for hosting a virtual machine disk is NOT recommended. If you want to boot virtual machines in Ceph (ephemeral backend or boot from volume), 
+please use the raw image format within Glance.
+
+The nodes running glance-api, cinder-volume, nova-compute and cinder-backup act as Ceph clients. Each requires the ceph.conf file
+
 
 
 
