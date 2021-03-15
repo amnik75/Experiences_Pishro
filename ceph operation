@@ -319,6 +319,41 @@ rbd device list
 image name).
 sudo rbd device unmap /dev/rbd/{poolname}/{imagename}
 
+# You can create a block device image from QEMU. You must specify rbd, the pool name, and the name of the image you wish to create. You must also specify the size 
+of the image.
+qemu-img create -f raw rbd:{pool-name}/{image-name} {size}
+
+The raw data format is really the only sensible format option to use with RBD. Technically, you could use other QEMU-supported formats (such as qcow2 or vmdk), 
+but doing so would add additional overhead, and would also render the volume unsafe for virtual machine live migration when caching is enabled.
+
+# You can resize a block device image from QEMU. You must specify rbd, the pool name, and the name of the image you wish to resize. You must also specify the 
+size of the image.
+qemu-img resize rbd:{pool-name}/{image-name} {size}
+
+You can retrieve block device image information from QEMU. You must specify rbd, the pool name, and the name of the image.
+qemu-img info rbd:{pool-name}/{image-name}
+
+QEMU can pass a block device from the host on to a guest, but since QEMU 0.15, there’s no need to map an image as a block device on the host. Instead, QEMU 
+attaches an image as a virtual block device directly via librbd. This strategy increases performance by avoiding context switches and taking advantage of RBD 
+caching
+You can use qemu-img to convert existing virtual machine images to Ceph block device images. For example, if you have a qcow2 image, you could run:
+qemu-img convert -f qcow2 -O raw debian_squeeze.qcow2 rbd:data/squeeze
+
+To run a virtual machine booting from that image, you could run:
+qemu -m 1024 -drive format=raw,file=rbd:data/squeeze
+RBD caching can significantly improve performance. Since QEMU 1.2, QEMU’s cache options control librbd caching:
+qemu -m 1024 -drive format=rbd,file=rbd:data/squeeze,cache=writeback
+
+Check to see if the VM is communicating with Ceph. Replace {vm-domain-name} with the name of your VM domain:
+sudo virsh qemu-monitor-command --hmp {vm-domain-name} 'info block'
+
+Check to see if the device from <target dev='vdb' bus='virtio'/> exists:
+virsh domblklist {vm-domain-name} --details
+
+
+
+
+
 
 
 
