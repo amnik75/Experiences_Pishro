@@ -100,3 +100,6 @@ id then send it to br-tun via path-tun.
 
 if restart neutron-agents then restart neutron-server to take affect in "neutron agent-list"
 
+It sounds very much like you are trying to run nova-compute/neutron-openvswitch on the same host as neutron-gateway. This is known problem and presents exactly 
+as you describe by removing and re-installing packages.
+The neutron-gateway node either needs to be on a separate host or in a LXD container. The other alternative is to run neutron-openvswitch in DVR mode.
