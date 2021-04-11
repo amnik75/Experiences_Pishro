@@ -20,5 +20,10 @@ $ radosgw-admin metadata get bucket:<bucket>
 $ radosgw-admin metadata get bucket.instance:<bucket>:<bucket_id>
 $ radosgw-admin metadata get user:<user>   # get or set
 
+The Ceph Object Gateway purges the storage space used for deleted and overwritten objects in the Ceph Storage cluster some time after the gateway deletes the 
+objects from the bucket index. The process of purging the deleted object data from the Ceph Storage cluster is known as Garbage Collection or GC
 
+Garbage collection is a background activity that may execute continuously or during times of low loads, depending upon how the administrator configures the Ceph 
+Object Gateway. By default, the Ceph Object Gateway conducts GC operations continuously. Since GC operations are a normal part of Ceph Object Gateway operations, 
+especially with object delete operations, objects eligible for garbage collection exist most of the time.
 
